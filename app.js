@@ -37,9 +37,9 @@ var financeController = (function(){
       var incomes = [];
       var expenses = [];
       
-      incomes.push(i1);
-      incomes.push(i2);
-      console.log(incomes[1].value);
+    //   incomes.push(i1);
+    //   incomes.push(i2);
+    //   console.log(incomes[1].value);
 
       var data = {
         allItems: {
@@ -52,8 +52,8 @@ var financeController = (function(){
         }
       }
 
-      data.allItems.inc.push(i1);
-      console.log(data.totals.inc)
+    //   data.allItems.inc.push(i1);
+    //   console.log(data.allItems.inc[0]);
 
       
 
