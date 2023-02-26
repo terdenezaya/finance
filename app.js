@@ -9,7 +9,7 @@ var uiController = (function(){
  return {
     getInput: function(){
         return {
-            type: document.querySelector(DOMstrings.inputType).value,
+            type: document.querySelector(DOMstrings.inputType).value, // exp, inp
             description: document.querySelector(DOMstrings.inputDescription).value,
             value: document.querySelector(DOMstrings.inputValue).value
             
@@ -22,18 +22,19 @@ var uiController = (function(){
 })();
 // Санхүүтэй ажиллах контроллер
 var financeController = (function(){
+    // private data
     var Income = function(id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
       };
-      
+      // private data
       var Expense = function(id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
       };
-      
+      // private data
       var incomes = [];
       var expenses = [];
       
@@ -42,13 +43,18 @@ var financeController = (function(){
     //   console.log(incomes[1].value);
 
       var data = {
-        allItems: {
+        items: {
             inc: [],
             exp: []
         },
         totals: {
             inc: 0,
             exp: 0
+        }
+      };
+      return {
+        addItem: function(type, desc, val){
+            console.log('item added...');
         }
       }
 
@@ -63,8 +69,12 @@ var appController = (function(uiController, fnController){
 
     var ctrlAddItem = function(){
          // 1. Оруулах өгөгдлийг олж авна.
-         console.log(uiController.getInput());
+        //  console.log(uiController.getInput());
+         var input = uiController.getInput();
          // 2. Олж авсан өгөгдлөө санхүүгийн контроллерт дамжуулж тэнд хадгална.
+         console.log(input);
+         financeController.addItem(input.type, input.description, input.value);
+         
          // 3. Олж авсан өгөгдлүүдийг веб дээрээ тохирох хэсэгт гаргана. 
          // 4. Төсвийг тооцоолно. 
          // 5. Эцсийн үлдэгдэл тооцоод дэлгэцэнд гаргана.
