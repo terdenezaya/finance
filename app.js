@@ -13,12 +13,36 @@ var uiController = (function(){
             description: document.querySelector(DOMstrings.inputDescription).value,
             value: document.querySelector(DOMstrings.inputValue).value
             
-        }
+        };
     },
+
     getDOMstrings: function() {
         return DOMstrings;
+    },
+
+    addListItem: function(item, type){
+        // Orlogo zarlagiin elementiig aguulsan html ii g beltgene
+        var html, list;
+        if(type === 'inc') {
+            list = ".income__list";
+            html = '<div class="item clearfix" id="income-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUe$$</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+        } else { 
+            list = ".expenses__list";
+            html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUe$$</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+
+        }
+
+        // HTML dotroo orlogo zarlagiig Replace ashiglaj uurchluh
+        console.log(item.id);
+        html = html.replace("%id%", item.id);
+        html = html.replace("$$DESCRIPTION$$", item.description);
+        html = html.replace("$$VALUe$$", item.value);
+        
+        // Beltgessen HTML ee DOM ruu hiij ugnu
+        document.querySelector(list).insertAdjacentHTML('beforeend', html);
+
     }
- }
+ };
 })();
 // Санхүүтэй ажиллах контроллер
 var financeController = (function(){
@@ -52,9 +76,28 @@ var financeController = (function(){
             exp: 0
         }
       };
+
       return {
         addItem: function(type, desc, val){
-            console.log('item added...');
+            
+            var item, id;
+
+            if(data.items[type].length === 0) id = 1; 
+            else {
+                data.items[type][data.items[type].length - 1]
+            }
+
+            if(type === 'inc'){
+                item = new Income(id, desc, val);
+            }else{
+                item = new Expense(id, desc, val);
+            }
+            data.items[type].push(item);
+            return item;
+        },
+        seeData: function(){
+            return data;
+
         }
       }
 
@@ -71,11 +114,18 @@ var appController = (function(uiController, fnController){
          // 1. Оруулах өгөгдлийг олж авна.
         //  console.log(uiController.getInput());
          var input = uiController.getInput();
+        
          // 2. Олж авсан өгөгдлөө санхүүгийн контроллерт дамжуулж тэнд хадгална.
-         console.log(input);
-         financeController.addItem(input.type, input.description, input.value);
+        //  console.log(input);
+         var item = financeController.addItem(
+            input.type, 
+            input.description, 
+            input.value);
          
          // 3. Олж авсан өгөгдлүүдийг веб дээрээ тохирох хэсэгт гаргана. 
+         uiController.addListItem(item, input.type);
+
+
          // 4. Төсвийг тооцоолно. 
          // 5. Эцсийн үлдэгдэл тооцоод дэлгэцэнд гаргана.
     };
