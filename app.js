@@ -4,7 +4,10 @@ var uiController = (function(){
         inputType: ".add__type",
         inputDescription: ".add__description",
         inputValue: ".add__value",
-        addBtn: ".add__btn"
+        addBtn: ".add__btn",
+        incomeList: ".income__list",
+        expenseList: ".expenses__list"
+
     }
  return {
     getInput: function(){
@@ -20,14 +23,33 @@ var uiController = (function(){
         return DOMstrings;
     },
 
+    clearFields: function(){
+        var fields = document.querySelectorAll(
+            DOMstrings.inputDescription + "," + DOMstrings.inputValue
+        );
+
+        // convert List to Array
+        var fieldsArr = Array.prototype.slice.call(fields);
+        
+        fieldsArr.forEach(function(el, index, array){
+            el.value = "";
+        });
+
+        fieldsArr[0].focus();
+
+        // for(var i = 0; i < fieldsArr.length; i++){
+        //     fieldsArr[i].value = "";
+        // }
+    },
+
     addListItem: function(item, type){
         // Orlogo zarlagiin elementiig aguulsan html ii g beltgene
         var html, list;
         if(type === 'inc') {
-            list = ".income__list";
+            list = DOMstrings.incomeList;
             html = '<div class="item clearfix" id="income-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUe$$</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
         } else { 
-            list = ".expenses__list";
+            list = DOMstrings.expenseList;
             html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUe$$</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
 
         }
@@ -47,7 +69,7 @@ var uiController = (function(){
 // Санхүүтэй ажиллах контроллер
 var financeController = (function(){
     // private data
-    var Income = function(id, description, value) {
+    var income = function(id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
@@ -62,9 +84,6 @@ var financeController = (function(){
       var incomes = [];
       var expenses = [];
       
-    //   incomes.push(i1);
-    //   incomes.push(i2);
-    //   console.log(incomes[1].value);
 
       var data = {
         items: {
@@ -88,7 +107,7 @@ var financeController = (function(){
             }
 
             if(type === 'inc'){
-                item = new Income(id, desc, val);
+                item = new income(id, desc, val);
             }else{
                 item = new Expense(id, desc, val);
             }
@@ -124,6 +143,7 @@ var appController = (function(uiController, fnController){
          
          // 3. Олж авсан өгөгдлүүдийг веб дээрээ тохирох хэсэгт гаргана. 
          uiController.addListItem(item, input.type);
+         uiController.clearFields();
 
 
          // 4. Төсвийг тооцоолно. 
