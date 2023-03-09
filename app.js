@@ -14,7 +14,7 @@ var uiController = (function(){
         return {
             type: document.querySelector(DOMstrings.inputType).value, // exp, inp
             description: document.querySelector(DOMstrings.inputDescription).value,
-            value: document.querySelector(DOMstrings.inputValue).value
+            value: parseInt(document.querySelector(DOMstrings.inputValue).value)
             
         };
     },
@@ -80,11 +80,20 @@ var financeController = (function(){
         this.description = description;
         this.value = value;
       };
+
+      var calculateTotal = function(type){
+        var sum = 0;
+        data.items[type].forEach(function(el){
+            sum = sum + el.value; 
+        });
+
+        data.totals[type] = sum;
+      };
+
       // private data
       var incomes = [];
       var expenses = [];
       
-
       var data = {
         items: {
             inc: [],
@@ -93,10 +102,40 @@ var financeController = (function(){
         totals: {
             inc: 0,
             exp: 0
-        }
+        },
+
+        tusuv: 0,
+
+        huvi: 0
+
       };
 
       return {
+        tusuvTooshoh: function(){
+
+            // Niit orlogiig tootsooloh.
+            calculateTotal('inc');
+            
+            // Niit zarlagiig tootsooloh.
+            calculateTotal('exp');
+
+            // tusviig shineer tootsoolno.
+            data.tusuv = data.totals.inc - data.totals.exp;
+
+            // Orlogo zarlagiin huviig tootsoolno.
+            data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+
+        },
+
+        tusuvAvah: function(){
+            return {
+                tusuv: data.tusuv,
+                huvi: data.huvi,
+                totalInc: data.totals.inc,
+                totalExp: data.totals.exp
+            }
+        },
+
         addItem: function(type, desc, val){
             
             var item, id;
@@ -132,9 +171,11 @@ var appController = (function(uiController, fnController){
     var ctrlAddItem = function(){
          // 1. Оруулах өгөгдлийг олж авна.
         //  console.log(uiController.getInput());
-         var input = uiController.getInput();
+        var input = uiController.getInput();
         
-         // 2. Олж авсан өгөгдлөө санхүүгийн контроллерт дамжуулж тэнд хадгална.
+        if(input.description !== "" && input.value !== "")
+        {
+              // 2. Олж авсан өгөгдлөө санхүүгийн контроллерт дамжуулж тэнд хадгална.
         //  console.log(input);
          var item = financeController.addItem(
             input.type, 
@@ -147,9 +188,20 @@ var appController = (function(uiController, fnController){
 
 
          // 4. Төсвийг тооцоолно. 
-         // 5. Эцсийн үлдэгдэл тооцоод дэлгэцэнд гаргана.
-    };
 
+            financeController.tusuvTooshoh();
+
+         // 5. Эцсийн үлдэгдэл тооцоод дэлгэцэнд гаргана.
+
+            var tusuv = financeController.tusuvAvah();
+
+         //  6.Tusuviin tootsoog Delgetsend gargana.
+        console.log(tusuv);
+
+        };
+
+    }
+                
  var setupEventListeners = function() {
     
     var DOM = uiController.getDOMstrings();
