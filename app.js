@@ -11,8 +11,15 @@ var uiController = (function(){
         incomeLabel: ".budget__income--value",
         expenseLabel: ".budget__expenses--value",
         percentageLabel: ".budget__expenses--percentage",
-        containerDiv: ".container"
+        containerDiv: ".container",
+        expensePercentageLabel: ".item__percentage"
     };
+
+    var nodelistForeach = function(list, callback) {
+        for (var i = 0; i < list.length; i++){
+            callback(list[i], i);
+        }
+    }
 
  return {
     getInput: function(){
@@ -21,6 +28,15 @@ var uiController = (function(){
             description: document.querySelector(DOMstrings.inputDescription).value,
             value: parseInt(document.querySelector(DOMstrings.inputValue).value)          
         };
+    },
+
+    displayPercentage: function(allPercentages) {
+        // Zarlagiin Nodelist-iig oloh.
+      var elements = document.querySelectorAll(DOMstrings.expensePercentageLabel);
+        //  Element bolgonii huvid zarlagiin huviig avch shivj oruulah
+        nodelistForeach(elements, function(el, index) {
+            el.textContent = allPercentages[index];
+        });
     },
 
     getDOMstrings: function() {
@@ -98,7 +114,18 @@ var financeController = (function() {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percentage = -1;
       };
+
+      Expense.prototype.calcPercentage = function(totalIncome) {
+        if (totalIncome > 0)
+         this.percentage = Math.round((this.value / totalIncome) * 100);
+        else this.percentage = 0;
+      };
+
+      Expense.prototype.getPercentage = function() {
+        return this.percentage;
+      }
 
       var calculateTotal = function(type){
         var sum = 0;
@@ -109,10 +136,7 @@ var financeController = (function() {
         data.totals[type] = sum;
       };
 
-      // private data
-    //   var incomes = [];
-    //   var expenses = [];
-      
+      // private data      
       var data = {
         items: {
             inc: [],
@@ -140,8 +164,22 @@ var financeController = (function() {
             data.tusuv = data.totals.inc - data.totals.exp;
 
             // Orlogo zarlagiin huviig tootsoolno.
-            data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            if (data.totals.inc > 0)
+             data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            else data.huvi = 0;
+        },
 
+        calculatePercentages: function() {
+          data.items.exp.forEach(function(el){
+            el.calcPercentage(data.totals.inc);
+          });  
+        },
+
+        getPercentages: function() {
+            var allPercentages = data.items.exp.map(function(el) {
+                return el.getPercentage();
+            });
+           return allPercentages;
         },
 
         tusuviigAvah: function(){
@@ -221,6 +259,15 @@ var appController = (function(uiController, financeController) {
 
         //  6.Tusuviin tootsoog Delgetsend gargana.
         uiController.tusviigUzuuleh(tusuv); 
+
+        // 7. Elementuudiin huviig tootsoolno.
+        financeController.calculatePercentages();
+
+        // 8. Elementuudiin huviig huleej avna.
+        var allPercentages = financeController.getPercentages();
+
+        // 9. Edgeer huviig delgetsend gargana.
+        uiController.displayPercentage(allPercentages);
 
 };
               
